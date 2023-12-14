@@ -50,7 +50,11 @@ func getTasks(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(resp)
+	_, err = w.Write(resp)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 // Обработчик для отправки задачи на сервер
@@ -93,7 +97,11 @@ func getTask(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(resp)
+	_, err = w.Write(resp)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 }
 
 // Обработчик удаления задачи по ID
@@ -121,11 +129,11 @@ func main() {
 	// регистрируем в роутере эндпоинт `/tasks` с методом POST, для которого используется обработчик `postTask`
 	r.Post("/tasks", postTask)
 
-	// регистрируем в роутере эндпоинт `/task/{id}` с методом GET, для которого используется обработчик `getTask`
-	r.Get("/task/{id}", getTask)
+	// регистрируем в роутере эндпоинт `/tasks/{id}` с методом GET, для которого используется обработчик `getTask`
+	r.Get("/tasks/{id}", getTask)
 
-	// регистрируем в роутере эндпоинт `/task/{id}` с методом DELETE, для которого используется обработчик `deleteTask`
-	r.Delete("/task/{id}", deleteTask)
+	// регистрируем в роутере эндпоинт `/tasks/{id}` с методом DELETE, для которого используется обработчик `deleteTask`
+	r.Delete("/tasks/{id}", deleteTask)
 
 	if err := http.ListenAndServe(":8080", r); err != nil {
 		fmt.Printf("Ошибка при запуске сервера: %s", err.Error())
